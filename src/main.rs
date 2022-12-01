@@ -1,7 +1,8 @@
 mod days;
 
 use std::error::Error;
-use std::io;
+use std::fs::File;
+use std::io::{self, BufReader, BufRead};
 use std::str::FromStr;
 
 use pico_args::Arguments;
@@ -27,7 +28,16 @@ fn main() -> Result<(), Box<dyn Error>> {
         .subcommand()?
         .map(|s| AOCDay::from_str(&s).unwrap_or(AOCDay::NoDay));
 
-    let input = io::stdin().lines();
+    let filename: Option<String> = args.opt_value_from_str("-f")?;
+    let input: Box<dyn BufRead> = match filename {
+        Some(filename) => {
+            let f = File::open(filename)?;
+            Box::new(BufReader::new(f))
+        }
+        None => {
+            Box::new(BufReader::new(io::stdin()))
+        }
+    };
 
     match subcommand {
         Some(Day1) => day1(input),
