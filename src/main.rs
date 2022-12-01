@@ -1,56 +1,33 @@
 mod days;
 
-use std::error::Error;
 use std::fs::File;
-use std::io::{self, BufReader, BufRead};
-use std::str::FromStr;
+use std::io::{stdin, BufReader, BufRead};
 
 use pico_args::Arguments;
-use strum_macros::EnumString;
-use days::day1;
+use days::*;
 
-#[derive(Debug, EnumString)]
-#[strum(ascii_case_insensitive)]
-enum AOCDay {
-    Day1,
-    Day2,
-    NoDay,
-}
-
-use AOCDay::*;
-
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() {
     println!("Advent of Code 2022");
 
     let mut args = Arguments::from_env();
 
-    let subcommand = args
-        .subcommand()?
-        .map(|s| AOCDay::from_str(&s).unwrap_or(AOCDay::NoDay));
+    let subcommand = args.subcommand().unwrap();
+    let day = subcommand.expect("Need day command");
 
-    let filename: Option<String> = args.opt_value_from_str("-f")?;
+    let filename: Option<String> = args.opt_value_from_str("-f").unwrap();
     let input: Box<dyn BufRead> = match filename {
         Some(filename) => {
-            let f = File::open(filename)?;
+            let f = File::open(filename).unwrap();
             Box::new(BufReader::new(f))
         }
         None => {
-            Box::new(BufReader::new(io::stdin()))
+            Box::new(BufReader::new(stdin()))
         }
     };
 
-    match subcommand {
-        Some(Day1) => day1(input),
-        Some(Day2) => {
-            todo!();
-        }
-        Some(NoDay) => {
-            println!("got some nonesense");
-        }
-        None => {
-            println!("got nothing");
-        }
+    match day.as_str() {
+        "day1" => day1(input),
+        "day2" => day2(input),
+        _ => (),
     };
-
-    Ok(())
 }

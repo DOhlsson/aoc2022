@@ -5,5 +5,3 @@ edition = "2021"
 
 [dependencies]
 pico-args = "0.5"
-strum = "0.24"
-strum_macros = "0.24"
