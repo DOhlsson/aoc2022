@@ -28,6 +28,9 @@ fn main() {
     match day.as_str() {
         "day1" => day1(input),
         "day2" => day2(input),
+        "day3" => day3(input),
+        "day4" => day4(input),
+        "day5" => day5(input),
         _ => (),
     };
 }

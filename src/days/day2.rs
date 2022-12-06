@@ -28,7 +28,7 @@ impl Hand {
         match (self, opp) {
             (Rock, Scissors) | (Paper, Rock) | (Scissors, Paper) => 6, // Win
             (Rock, Rock) | (Paper, Paper) | (Scissors, Scissors) => 3, // Draw
-            (Rock, Paper) | (Paper, Scissors) | (Scissors, Rock) => 0, // Loss
+            (Rock, Paper) | (Paper, Scissors) | (Scissors, Rock) => 0,
         }
     }
 
@@ -67,14 +67,6 @@ impl Outcome {
             (Win, Scissors) | (Draw, Rock) | (Loss, Paper) => Rock,
             (Win, Rock) | (Draw, Paper) | (Loss, Scissors) => Paper,
             (Win, Paper) | (Draw, Scissors) | (Loss, Rock) => Scissors,
-        }
-    }
-
-    fn value(self: &Outcome) -> i32 {
-        match self {
-            Win => 6,
-            Draw => 3,
-            Loss => 0,
         }
     }
 }
