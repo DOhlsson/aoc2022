@@ -31,6 +31,7 @@ fn main() {
         "day3" => day3(input),
         "day4" => day4(input),
         "day5" => day5(input),
+        "day6" => day6(input),
         _ => (),
     };
 }
