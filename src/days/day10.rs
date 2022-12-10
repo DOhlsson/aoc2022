@@ -52,7 +52,7 @@ pub fn day10(input: Box<dyn BufRead>) {
                 cpu.instructions.push(NOOP);
             }
             (Some("addx"), Some(nbr)) => {
-                let num = nbr.parse::<i32>().unwrap();
+                let num = nbr.parse().unwrap();
                 cpu.instructions.push(_ADDX);
                 cpu.instructions.push(ADDX(num));
             }
