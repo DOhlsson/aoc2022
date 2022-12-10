@@ -26,7 +26,7 @@ impl Iterator for CPU {
                 let val = self.register_x;
                 self.register_x += num;
                 Some(val)
-            },
+            }
             None => None,
         };
 
@@ -63,7 +63,25 @@ pub fn day10(input: Box<dyn BufRead>) {
     }
 
     let mut enumerated = cpu.clone().enumerate();
-    enumerated.nth(18).unwrap();
-    let part1: i32 = enumerated.step_by(40).map(|(i, x)| (i as i32 + 1) * x).sum();
+    enumerated.nth(18).unwrap(); // Advance the cpu to the 20th cycle
+    let part1: i32 = enumerated
+        .step_by(40)
+        .map(|(i, x)| (i as i32 + 1) * x)
+        .sum();
     println!("Part 1: {}", part1);
+
+    println!("Part 2:");
+    for _ in 0..6 {
+        for pos in 0..40 {
+            let x = cpu.next().unwrap();
+            let sprite = x..(x + 3);
+
+            if sprite.contains(&(pos as i32 + 1)) {
+                print!("#");
+            } else {
+                print!(".");
+            }
+        }
+        println!();
+    }
 }
