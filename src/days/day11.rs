@@ -3,28 +3,30 @@ use std::{fmt::Display, io::BufRead};
 use Argument::*;
 use Operator::*;
 
-#[derive(Debug)]
+type Num = u64;
+
+#[derive(Clone, Debug)]
 enum Argument {
     Old,
-    Val(i32),
+    Val(Num),
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 enum Operator {
     Mul,
     Add,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 struct Monkey {
     num: usize,
-    items: Vec<i32>,
+    items: Vec<Num>,
     operator: Operator,
     argument: Argument,
-    test_div: i32,
+    test_div: Num,
     if_true_target: usize,
     if_false_target: usize,
-    inspections: i32,
+    inspections: Num,
 }
 
 impl Display for Monkey {
@@ -53,9 +55,9 @@ pub fn day11(input: Box<dyn BufRead>) {
         let second = lines.next().unwrap();
         println!("{second}");
         let second = second.strip_prefix("  Starting items: ").unwrap();
-        let items: Vec<i32> = second
+        let items = second
             .split(", ")
-            .map(|item| item.parse().unwrap())
+            .filter_map(|item| item.parse().ok())
             .collect();
         println!("items = {:?}", items);
 
@@ -77,7 +79,7 @@ pub fn day11(input: Box<dyn BufRead>) {
         let fourth = lines.next().unwrap();
         println!("{fourth}");
         let fourth = fourth.strip_prefix("  Test: divisible by ").unwrap();
-        let test_div: i32 = fourth.parse().unwrap();
+        let test_div = fourth.parse().unwrap();
         println!("test_div = {}", test_div);
 
         let fifth = lines.next().unwrap();
@@ -113,29 +115,54 @@ pub fn day11(input: Box<dyn BufRead>) {
         }
     }
 
-    for _ in 0..20 {
+    let part1 = solve(&mut monkeys.clone(), 20, false);
+    println!("Part 1: {}", part1);
+
+    let part2 = solve(&mut monkeys, 10_000, true);
+    println!("Part 2: {}", part2);
+}
+
+fn solve(monkeys: &mut Vec<Monkey>, rounds: i32, part2: bool) -> Num {
+    let lcd = if part2 {
+        let mut res = 1;
+        for i in 0..monkeys.len() {
+            res = res * monkeys[i].test_div;
+        }
+        res
+    } else {
+        0
+    };
+
+    for _ in 0..rounds {
         for i in 0..monkeys.len() {
             while monkeys[i].items.len() > 0 {
                 monkeys[i].inspections += 1;
                 let mut worry = monkeys[i].items.remove(0);
-                let val = match monkeys[i].argument {
-                    Val(v) => v,
-                    Old => worry,
+                let val: Num = match &monkeys[i].argument {
+                    Val(v) => v.clone(),
+                    Old => worry.clone(),
                 };
 
                 worry = match monkeys[i].operator {
-                    Mul => worry * val,
+                    Mul => {
+                        worry * val
+                    },
                     Add => worry + val,
                 };
 
-                worry = worry / 3;
+                if part2 {
+                    worry = worry % lcd;
+                } else {
+                    worry = worry / 3;
+                }
 
-                let test = worry % monkeys[i].test_div == 0;
+                let test = worry.clone() % monkeys[i].test_div.clone() == 0u8.into();
                 let if_true_target = monkeys[i].if_true_target;
                 let if_false_target = monkeys[i].if_false_target;
+
                 match test {
-                    true => monkeys[if_true_target].items.push(worry),
-                    false => monkeys[if_false_target].items.push(worry),
+                    true => monkeys[if_true_target].items.push(worry.clone()),
+                    false => monkeys[if_false_target].items.push(worry.clone()),
                 }
             }
         }
@@ -148,5 +175,5 @@ pub fn day11(input: Box<dyn BufRead>) {
     monkeys.sort_by(|a, b| b.inspections.cmp(&a.inspections));
 
     let part1 = monkeys[0].inspections * monkeys[1].inspections;
-    println!("Part 1: {}", part1);
+    return part1;
 }
